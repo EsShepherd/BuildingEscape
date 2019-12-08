@@ -12,7 +12,6 @@ VS Generated Files#
 ###################
 *.VC.db
 
-BuildingEscape/.vs/BuildingEscape/v15/.suo
 BuildingEscape/.vs/*
 
 tips.txt

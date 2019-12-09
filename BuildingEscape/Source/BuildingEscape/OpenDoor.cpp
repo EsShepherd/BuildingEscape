@@ -26,16 +26,22 @@ void UOpenDoor::BeginPlay()
 
 void UOpenDoor::OpenDoor()
 {
-	// Find owning actor
-	AActor* Owner = GetOwner();
-	Owner->GetActorRotation();
-
-	// Create a rotator
-	FRotator NewRotation = FRotator(0.0f, OpenAngle, 0.0f);
-
-	// Set the door rotation
-	_sleep(Delay);
+	FRotator CurRotation = Owner->GetActorRotation();
+	FRotator NewRotation = FRotator(0.f, OpenAngle, 0.f);
 	Owner->SetActorRotation(NewRotation);
+	if (CurRotation != Owner->GetActorRotation()) {
+		if (OpenSound != nullptr) OpenSound->Play();
+	}
+}
+
+void UOpenDoor::CloseDoor()
+{
+	FRotator CurRotation = Owner->GetActorRotation();
+	FRotator NewRotation = FRotator(0.f, CloseAngle, 0.f);
+	Owner->SetActorRotation(NewRotation);
+	if (CurRotation != Owner->GetActorRotation()) {
+		if (CloseSound != nullptr) CloseSound->Play();
+	}
 }
 
 
@@ -43,13 +49,24 @@ void UOpenDoor::OpenDoor()
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// Poll trigger value
 	// If ActorThatOpens is in the volume
 	if (PressurePlate->IsOverlappingActor(ActorThatOpens)) {
-		UE_LOG(LogTemp, Warning, TEXT("OPEN DOOR FUCKTARD"));
 		OpenDoor();
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
-	
+	// Check if its time to close the door
+	if (IsOpen()) {
+		if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > TimeToClose) {
+			CloseDoor();
+		}
+	} 
+}
+
+bool UOpenDoor::IsOpen()
+{
+	if (GetOwner()->GetActorRotation().Yaw != CloseAngle) {
+		return true;
+	}
+	return false;
 }
 

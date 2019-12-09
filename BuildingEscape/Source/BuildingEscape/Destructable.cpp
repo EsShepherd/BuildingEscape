@@ -22,7 +22,6 @@ void UDestructable::BeginPlay()
 {
 	Super::BeginPlay();
 	CollidingActor = GetWorld()->GetFirstPlayerController()->GetPawn();
-	TargetAudioComponent = (UAudioComponent*)GetOwner()->GetComponentsByTag(UAudioComponent::StaticClass(), "DestructAudio")[0];
 	// ...
 	
 }
@@ -32,9 +31,10 @@ void UDestructable::BeginPlay()
 void UDestructable::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if (OneShotTrigger->IsOverlappingActor(CollidingActor)) {
-		Destruct();
+	if (CanBeOneShotted) {
+		if (OneShotTrigger->IsOverlappingActor(CollidingActor)) {
+			Destruct();
+		}
 	}
 	if (GetOwner()->IsOverlappingActor(CollidingActor)) {
 		Health -= 1;
@@ -48,10 +48,9 @@ void UDestructable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UDestructable::Destruct()
 {
-	//play sound
-	//TargetAudioComponent->Play();
 	//*optional* shattering effect
 	//vanish
+	if (DestructSound != nullptr) DestructSound->Play();
 	GetOwner()->Destroy();
 }
 

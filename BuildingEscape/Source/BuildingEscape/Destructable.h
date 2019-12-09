@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/TriggerVolume.h"
-#include "Components/AudioComponent.h"
+#include "Sound/AmbientSound.h"
 #include "Destructable.generated.h"
 
 
@@ -30,15 +30,17 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	int8 Health = 100;
+		int8 Health = 100;
 
 	UPROPERTY(EditAnywhere)
-	AActor* CollidingActor;
+		AActor* CollidingActor;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* OneShotTrigger;
+		bool CanBeOneShotted = false;
+	UPROPERTY(EditAnywhere)
+		ATriggerVolume* OneShotTrigger;
 
 	UPROPERTY(EditAnywhere)
-	UAudioComponent* TargetAudioComponent;
+		AAmbientSound* DestructSound;
 	
 };

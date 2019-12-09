@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/TriggerVolume.h"
+#include "Sound/AmbientSound.h"
 #include "OpenDoor.generated.h"
 
 
@@ -23,21 +24,38 @@ protected:
 	virtual void BeginPlay() override;
 
 	void OpenDoor();
+	void CloseDoor();
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	bool IsOpen();
+
 		
 private:
 	UPROPERTY(EditAnywhere)
-	float OpenAngle = 60.f;
+		float OpenAngle = 75.f;
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+		float CloseAngle = 0.f;
 
 	UPROPERTY(EditAnywhere)
-	AActor* ActorThatOpens; //Pawn inherits from actor
+		ATriggerVolume* PressurePlate;
+	UPROPERTY(EditAnywhere)
+		AActor* ActorThatOpens; //Pawn inherits from actor
+	
+	UPROPERTY(EditAnywhere)
+		AAmbientSound* OpenSound;
+	UPROPERTY(EditAnywhere)
+		AAmbientSound* CloseSound;
 
 	UPROPERTY(EditAnywhere)
-	float Delay = 0;
+		float Delay = 0.f;
+	UPROPERTY(EditAnywhere)
+		float TimeToClose = 0.f;
+
+
+	AActor* Owner = GetOwner();
+	float LastDoorOpenTime = 0.f;
+	float LastDoorCloseTime = 0.f;
 };

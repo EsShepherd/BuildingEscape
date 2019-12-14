@@ -43,6 +43,8 @@ private:
 		ATriggerVolume* PressurePlate;
 	UPROPERTY(EditAnywhere)
 		AActor* ActorThatOpens; //Pawn inherits from actor
+	UPROPERTY(EditAnywhere)
+		bool PlayerIsATO;
 	
 	UPROPERTY(EditAnywhere)
 		AAmbientSound* OpenSound;

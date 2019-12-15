@@ -32,6 +32,8 @@ public:
 
 	bool IsOpen();
 
+	
+
 		
 private:
 	UPROPERTY(EditAnywhere)
@@ -42,9 +44,7 @@ private:
 	UPROPERTY(EditAnywhere)
 		ATriggerVolume* PressurePlate;
 	UPROPERTY(EditAnywhere)
-		AActor* ActorThatOpens; //Pawn inherits from actor
-	UPROPERTY(EditAnywhere)
-		bool PlayerIsATO;
+		float TriggerMass;
 	
 	UPROPERTY(EditAnywhere)
 		AAmbientSound* OpenSound;
@@ -60,4 +60,7 @@ private:
 	AActor* Owner = GetOwner();
 	float LastDoorOpenTime = 0.f;
 	float LastDoorCloseTime = 0.f;
+
+	// Returns total mass in kg
+	float GetTotalMassOfActorsOnPlate();
 };

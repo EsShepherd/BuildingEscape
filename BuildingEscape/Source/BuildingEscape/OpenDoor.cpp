@@ -23,26 +23,19 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!PressurePlate) {
+		UE_LOG(LogTemp, Warning, TEXT("%s missing pressure plate!"), *Owner->GetName());
+	}
 }
 
 void UOpenDoor::OpenDoor()
 {
-	FRotator CurRotation = Owner->GetActorRotation();
-	FRotator NewRotation = FRotator(0.f, OpenAngle, 0.f);
-	Owner->SetActorRotation(NewRotation);
-	if (CurRotation != Owner->GetActorRotation()) {
-		if (OpenSound != nullptr) OpenSound->Play();
-	}
+	OnOpen.Broadcast();
 }
 
 void UOpenDoor::CloseDoor()
 {
-	FRotator CurRotation = Owner->GetActorRotation();
-	FRotator NewRotation = FRotator(0.f, CloseAngle, 0.f);
-	Owner->SetActorRotation(NewRotation);
-	if (CurRotation != Owner->GetActorRotation()) {
-		if (CloseSound != nullptr) CloseSound->Play();
-	}
+	OnClose.Broadcast();
 }
 
 
@@ -51,24 +44,31 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	// If ActorThatOpens is in the volume
-	if (GetTotalMassOfActorsOnPlate() > TriggerMass) {
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+	if (DoorIsClosed) { //prevent spamming when in trigger volume
+		if (GetTotalMassOfActorsOnPlate() > TriggerMass) {
+			OpenDoor();
+			DoorIsClosed = false;
+			LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		}
 	}
 	// Check if its time to close the door
-	if (IsOpen()) {
+	if (!DoorIsClosed) {
 		if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > TimeToClose) {
 			CloseDoor();
+			DoorIsClosed = true;
 		}
-	} 
+	}
 }
 
-bool UOpenDoor::IsOpen()
+
+float UOpenDoor::GetOpenAngle()
 {
-	if (GetOwner()->GetActorRotation().Yaw != CloseAngle) {
-		return true;
-	}
-	return false;
+	return OpenAngle;
+}
+
+float UOpenDoor::GetSwingTime()
+{
+	return SwingTime;
 }
 
 float UOpenDoor::GetTotalMassOfActorsOnPlate() {
@@ -76,7 +76,11 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate() {
 
 	// Find all overlapping actors
 	TArray<AActor*> OverlappingActors;
-	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+	if (PressurePlate != nullptr) PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("PressurePlate is nullptr"));
+		return 0;
+	}
 	for (const auto& Actor : OverlappingActors) {
 		UE_LOG(LogTemp, Warning, TEXT("%s is in the Trigger Volume"), *Actor->GetName());
 		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();

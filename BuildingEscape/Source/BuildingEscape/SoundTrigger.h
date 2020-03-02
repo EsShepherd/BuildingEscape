@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Sound/AmbientSound.h"
+#include "Components/AudioComponent.h"
 #include "Engine/TriggerVolume.h"
 #include "SoundTrigger.generated.h"
 
@@ -26,10 +26,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/** The sound to be played*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound)
+		class USoundBase* SoundToPlay;
+
 private:
-	UPROPERTY(EditAnywhere)
-	AAmbientSound* SoundToPlay;
-	UPROPERTY(EditAnywhere)
+	
+	UAudioComponent* SoundAC;
 	AActor* ActorWhoInteracts;
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* TriggerBox;

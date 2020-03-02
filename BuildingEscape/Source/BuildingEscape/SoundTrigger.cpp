@@ -21,7 +21,10 @@ void USoundTrigger::BeginPlay()
 {
 	Super::BeginPlay();
 	ActorWhoInteracts = GetWorld()->GetFirstPlayerController()->GetPawn();
-
+	if (SoundAC) SoundAC->SetSound(SoundToPlay);
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("<%s><SoundTrigger> SoundToPlay is nullptr!"), *GetOwner()->GetName());
+	}
 	// ...
 	
 }
@@ -33,9 +36,9 @@ void USoundTrigger::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	if (TriggerBox != nullptr && SoundToPlay != nullptr) {
+	if (TriggerBox != nullptr && SoundAC != nullptr) {
 		if (TriggerBox->IsOverlappingActor(ActorWhoInteracts)) {
-			SoundToPlay->Play();
+			SoundAC->Play();
 		}
 	}
 }
